@@ -1,0 +1,41 @@
+<header class="hero-unit" id="banner">
+  <div class="container">
+    <h1>Dropzone</h1>
+    <p class="lead">Drag and drop your files to upload them to your active cloud accounts, or login below</p>
+  </div>
+</header>
+{{$ctrl.$cookies.get('currentCloud')}}
+<div class="container" ng-show='$ctrl.isLoggedIn()'>
+  <div class="nav navbar">
+    <ul class="nav nav-tabs">
+      <li role="presentation" class='cloud-login-image' ng-class="$ctrl.$cookies.get('currentCloud') == 'dropbox' ? 'active':''"><a ng-click='$ctrl.accessCloud("dropbox")'><img src='assets/images/dropbox.png'/> Dropbox</a></li>
+      <li role="presentation" class='cloud-login-image' ng-class="$ctrl.$cookies.get('currentCloud') == 'googledrive'? 'active':''"><a ng-click='$ctrl.accessCloud("googledrive")'><img src='assets/images/googledrive.png'/> Google Drive</a></li>
+      <li role="presentation" class='cloud-login-image' ng-class="$ctrl.$cookies.get('currentCloud') == 'box'? 'active':''"><a ng-click='$ctrl.accessCloud("box")'><img src='assets/images/box.png'/> Box</a></li>
+    </ul>
+  </div>
+  <table id='files-table'>
+    <thead><tr><th>{{currentFolders[currentTab]}}</th></tr></thead>
+    <tbody>
+      <tr>
+        <td id='files-container'>
+          <div class='list-group'>
+            <ul class='folder list-group'>
+              {{user[currentTab + 'files'].name}}
+              <li ng-if='item.type=="folder"' ng-repeat="item in $ctrl.userFiles[$ctrl.$cookies.get('currentCloud') + 'files'].items" ng-include="'item_template'" ng-click='getFolder($event, item)' class='sub folder list-group-item'>{{item}}</li>
+              <li ng-if='item.type=="file"' ng-repeat="item in $ctrl.userFiles[$ctrl.$cookies.get('currentCloud') + 'files'].items" ng-include="'item_template'" ng-click='getFolder($event, item)' class='sub file list-group-item' >{{item}}</li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- FILE CONTAINER PARTIAL -->
+<script type="text/ng-template" id="item_template">
+  <span ng-if='item.type == "folder"'>{{item.name}}</span>
+  <div ng-if='item.type == "file"'><span>{{item.name}}</span><span ng-click='moreInfo(item.id, currentTab)'>More Info</span><span ng-click='downloadFromCloud(item.id, currentTab)'>Download</span><span ng-click='deleteFromCloud({id: item.id, name: item.name, eTag: item.etag, parentID:item.parentID}, currentTab)'>Delete</span><span ng-click='changeToInputField($event, item, item.name)'>Rename</span><span ng-click='openMoveFileDialog(item)'>Move</span></div>
+  <ul class='list-group'>
+    <li ng-if='item.type=="folder"'  ng-repeat="item in item.items" ng-click='getFolder($event, item)' ng-include="'item_template'" class='folder list-group-item'></li>
+    <li ng-if='item.type=="file"' ng-repeat="item in item.items" ng-click='getFolder($event, item)' ng-include="'item_template'" class='file list-group-item'></li>
+  </ul>
+</script>
